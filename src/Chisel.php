@@ -1,8 +1,9 @@
 <?php
 class Chisel {
   
-  function __construct($url) {
-    $this->body = Guzzle::get($url)->getBody();
+  function __construct($url, $body = null) {
+    $this->url     = $url;
+    $this->body    = $body ? $body : Guzzle::get($url)->getBody();
     $this->crawler = new Crawler($this->body);
   }
   
@@ -37,16 +38,27 @@ class Chisel {
   /*
    * Return a hash of og tags
    */
-  function get_og_tags() {
+  function og_tags() {
     $tags = [];
     
-    array_map(function ($node) use (&$tags) {
-      
-      $tags[$node->attr('property')] = $node->attr('content');
-      
-    }, $this->nodes('meta[property^="og:"]'));
+    $this->crawler->filter('meta[property^="og:"]')->each(function ($tag) use (&$tags) {
+      $tags[$tag->attr('property')] = $tag->attr('content');
+    });
     
     return $tags;
+  }
+  
+  /*
+   * Return array of unique link urls
+   */
+  function links() {
+    $links = [];
+    
+    $this->crawler->filter('a')->each(function ($a) use (&$links) {
+      $links[] = $a->attr('href');
+    });
+    
+    return array_unique($links);
   }
   
   /*
