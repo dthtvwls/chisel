@@ -6,10 +6,16 @@ class Chisel {
     $this->crawler = new Crawler($this->body);
   }
   
+  /*
+   * returns array of nodes
+   */
   function nodes($selector) {
     return iterator_to_array($this->crawler->filter($selector));
   }
   
+  /*
+   * returns first match in array
+   */
   function attempt($selectors) {
     $attempt = 0;
     do {
@@ -18,12 +24,34 @@ class Chisel {
     return $node->count() > 0 ? $node->first() : null;
   }
   
+  /*
+   * Return a group of fields?
+   * TODO: figure out wtf i was thinking
+   */
   function group($fields) {
     foreach ($fields as $name => $selector) {
       
     }
   }
   
+  /*
+   * Return a hash of og tags
+   */
+  function get_og_tags() {
+    $tags = [];
+    
+    array_map(function ($node) use (&$tags) {
+      
+      $tags[$node->attr('property')] = $node->attr('content');
+      
+    }, $this->nodes('meta[property^="og:"]'));
+    
+    return $tags;
+  }
+  
+  /*
+   * Returns Readability content after cleaning and caching
+   */
   function readable($allowed_tags = '<p><a><h1><h2><h3>', $allowed_classes = []) {
     // If this function has run before on this instance then return the saved text
     if ($this->_readable) return $this->_readable;
