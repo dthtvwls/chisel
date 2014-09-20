@@ -49,13 +49,13 @@ class Chisel {
   }
   
   /*
-   * Return array of unique link urls
+   * Return unique array of absolute links
    */
   function links() {
     $links = [];
     
-    $this->crawler->filter('a')->each(function ($a) use (&$links) {
-      $links[] = $a->attr('href');
+    $this->crawler->filter('a')->each(function ($a) use (&$links) {      
+      $links[] = (new Zend\Uri\Uri($a->attr('href')))->resolve($this->url)->toString();
     });
     
     return array_unique($links);
@@ -99,8 +99,9 @@ class Chisel {
     return $this->_readable;
   }
   
-  function terms() {
-    return (new TermExtractor)->extract(strip_tags($this->readable()));
+  function terms($corpus = null) {
+    if (!$corpus) $corpus = $this->readable;
+    return (new TermExtractor)->extract(strip_tags($corpus));
   }
   
 }
