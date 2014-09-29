@@ -2,8 +2,16 @@
 class Chisel {
   
   function __construct($url, $body = null) {
-    $this->url     = $url;
-    $this->body    = $body ? $body : Guzzle::get($url)->getBody();
+
+    if ($body) {
+      $this->url  = $url;
+      $this->body = $body;
+    } else {
+      $response   = Guzzle::get($url);
+      $this->url  = $response->getEffectiveUrl(); // important if redirected
+      $this->body = $response->getBody();
+    }
+
     $this->crawler = new Crawler($this->body);
   }
   
@@ -19,9 +27,12 @@ class Chisel {
    */
   function attempt($selectors) {
     $attempt = 0;
+
     do {
       $node = $this->crawler->filter($selectors[$attempt]);
+
     } while ($node->count() == 0 && ++$attempt < count($selectors));
+
     return $node->count() > 0 ? $node->first() : null;
   }
   
@@ -100,7 +111,7 @@ class Chisel {
   }
   
   function terms($corpus = null) {
-    if (!$corpus) $corpus = $this->readable;
+    if (!$corpus) $corpus = $this->_readable;
     return (new TermExtractor)->extract(strip_tags($corpus));
   }
   

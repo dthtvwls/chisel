@@ -10,8 +10,9 @@
     "fivefilters/php-readability": "1.0",
     "fivefilters/term-extractor" : "1.0",
     "guzzlehttp/guzzle"          : "~4.2.2",
-    "symfony/css-selector"       : "~2.5.4",
-    "symfony/dom-crawler"        : "~2.5.4",
+    "nlp-tools/nlp-tools"        : "0.1",
+    "symfony/css-selector"       : "~2.5.5",
+    "symfony/dom-crawler"        : "~2.5.5",
     "zendframework/zend-uri"     : "~2.3.3"
   },
   "require-dev": {
